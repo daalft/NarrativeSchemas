@@ -169,7 +169,9 @@ public class Reader {
 	 * @throws IOException 
 	 */
 	public void readPairBuffer (String path, boolean fullPrep) throws IOException {
-		BufferedReader br = new BufferedReader(new FileReader(path));
+		if (path.equals(""))
+			return;
+		BufferedReader br = new BufferedReader(new FileReader(new File(path)));
 		String l = "";
 		while ((l = br.readLine())!=null) {
 			// ignore headers and empty lines
