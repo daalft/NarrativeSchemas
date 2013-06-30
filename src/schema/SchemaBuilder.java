@@ -60,7 +60,7 @@ public class SchemaBuilder {
 	/**
 	 * List of merged events
 	 */
-	private List<Event> list, otherlist;
+	private List<Event> list, activeList;
 	/**
 	 * Schema size
 	 */
@@ -83,7 +83,7 @@ public class SchemaBuilder {
 		mentionPool = new ArrayList<String>();
 		dependencyPool = new ArrayList<String>();
 		schemas = new ArrayList<Schema>();
-		otherlist = new ArrayList<Event>();
+		activeList = new ArrayList<Event>();
 	}
 
 	/**
@@ -142,6 +142,7 @@ public class SchemaBuilder {
 		//System.err.println("Total mentions: " + localMentions.size());
 		// merge events
 		list = mergeEvents();
+		
 		// remove verbs that don't have subject and object
 		purifyList();
 		// outer loop: for all verbs
@@ -450,8 +451,10 @@ public class SchemaBuilder {
 		List<Event> events = getEvents(verb);
 		// add all events to schema
 		for (int i = 0; i < events.size(); i++) {
+			Event e = events.get(i);
+			e.setMaxScore(beta);
 			// create new chain for each event
-			n.add(events.get(i), i);
+			n.add(e, i);
 		}
 		// delete original verb
 		deleteVerb(verb);
@@ -459,6 +462,8 @@ public class SchemaBuilder {
 		loop:
 			// while schema contains less than schemaSize verbs
 			while (n.getVerbCount() < schemaSize) {
+				// remember verb count
+				
 				// initialize local score lists
 				List<GlobalScore> gs = new ArrayList<GlobalScore>();
 				List<Score> scoreS = new ArrayList<Score>();
@@ -469,9 +474,9 @@ public class SchemaBuilder {
 				Score maxO = null;
 				Score maxP = null;
 				// for all events
-				for (int i = 0; i < otherlist.size(); i++) {
+				for (int i = 0; i < activeList.size(); i++) {
 					// get i-th event
-					Event e = otherlist.get(i);
+					Event e = activeList.get(i);
 					// get verb of event
 					String v = e.getVerb();
 					// get all events with verb
@@ -490,7 +495,7 @@ public class SchemaBuilder {
 							String dep = event.getDependency(false);
 							// calculate score
 							// and remember event position and chain position
-							Score eventScore = scorecalc(otherlist.indexOf(event), j, chainsim(chains.get(j), event.getVerb(), dep));
+							Score eventScore = scorecalc(activeList.indexOf(event), j, chainsim(chains.get(j), event.getVerb(), dep));
 							// add score to relevant list
 							if (dep.equals("s"))
 								scoreS.add(eventScore);
@@ -505,7 +510,7 @@ public class SchemaBuilder {
 					maxO = scoreO.isEmpty()?new Score():Collections.max(scoreO);
 					maxP = scoreP.isEmpty()?new Score():Collections.max(scoreP);
 					// calculate global maximum value
-					double globalMax = (maxS==null?0:maxS.getScore()) + (maxO==null?0:maxO.getScore()) + (maxP==null?0:maxP.getScore());
+					double globalMax = (maxS==null?beta:maxS.getScore()) + (maxO==null?beta:maxO.getScore()) + (maxP==null?beta:maxP.getScore());
 					// if global maximum value higher than 3 times beta
 					if (globalMax > 3*beta)
 						// add to global scores
@@ -524,7 +529,8 @@ public class SchemaBuilder {
 				// if maximum subject score exists
 				if (bestS != null) {
 					// get event at remembered position
-					Event es = otherlist.get(bestS.getEventPosition());
+					Event es = activeList.get(bestS.getEventPosition());
+					es.setMaxScore(best.getScore());
 					// only continue if subject and object do not point to the same chain
 					if (bestS.getChainPosition() != bestO.getChainPosition()) {
 						// if event not already in schema
@@ -533,31 +539,30 @@ public class SchemaBuilder {
 							// create new chain
 							if (bestS.getScore() <= beta) {
 								n.add(es, n.getChainCount()+1);
+								bestS.setChainPosition(bestS.getChainPosition()+1);
 							} else { // else add at specified chain position
 								n.add(es, bestS.getChainPosition());
 							}
-							// increment global score of schema
-							n.incrementScore(bestS.getScore());
-							// increment chain score
 							n.getChains().get(bestS.getChainPosition()).setScore(bestS.getScore());
 						}
-						// delete verb from list of currently active verbs
+						// set verb to delete
 						vtd = es.getVerb();
 					}
 				}
 				// same as above
 				if (bestO != null) {
-					Event eo = otherlist.get(bestO.getEventPosition());
+					Event eo = activeList.get(bestO.getEventPosition());
+					eo.setMaxScore(best.getScore());
 					if (bestO.getChainPosition() != bestS.getChainPosition()) {
 
 						if (!n.contains(eo)) {
 							if (bestO.getScore() <= beta) {
 								n.add(eo, n.getChainCount()+1);
+								bestO.setChainPosition(bestO.getChainPosition()+1);
 							} else {
 								n.add(eo, bestO.getChainPosition());
 							}
 							n.getChains().get(bestO.getChainPosition()).setScore(bestO.getScore());
-							n.incrementScore(bestO.getScore());
 						}
 						if (vtd.equals(""))
 							vtd = eo.getVerb();
@@ -565,20 +570,21 @@ public class SchemaBuilder {
 				}
 				// same as above
 				if (bestP != null) {
-					Event ep = otherlist.get(bestP.getEventPosition());
-
+					Event ep = activeList.get(bestP.getEventPosition());
+					ep.setMaxScore(best.getScore());
 					if (!n.contains(ep)) {
 						if (bestP.getScore() <= beta) {
 							n.add(ep, n.getChainCount()+1);
+							bestP.setChainPosition(bestP.getChainPosition()+1);
 						} else {
 							n.add(ep, bestP.getChainPosition());
 						}
 						n.getChains().get(bestP.getChainPosition()).setScore(bestP.getScore());
-						n.incrementScore(bestP.getScore());
 					}
 					if (vtd.equals(""))
 						vtd = ep.getVerb();
 				}
+				
 				// delete verb
 				deleteVerb(vtd);
 				// clear global score list
@@ -729,7 +735,10 @@ public class SchemaBuilder {
 	private void purifyList () {
 		for (int i = 0; i < list.size(); i++) {
 			if (!(hasComplement(list.get(i), "s") &&hasComplement(list.get(i), "o"))) {
+				
 				list.remove(i--);
+				
+				
 			}
 		}
 	}
@@ -751,19 +760,25 @@ public class SchemaBuilder {
 	 * @throws IOException
 	 */
 	public void run (boolean shuffle, boolean sort, String filename, boolean writeFreqFile) throws IOException {
+		// read data
 		readData(writeFreqFile);
 		list = mergeEvents();
 		purifyList();
-		otherlist.addAll(list);
+		// populate list of active verbs
+		activeList.addAll(list);
 		if (shuffle)
-			Collections.shuffle(otherlist);
+			Collections.shuffle(activeList);
 		if (sort)
-			Collections.sort(otherlist);
+			Collections.sort(activeList);
 		long start = System.currentTimeMillis();
 		System.err.print("Building schemas...");
-		for (int i = 0; i < otherlist.size(); i++) {
-			Schema s = buildSchema(otherlist.get(i).getVerb());
-			if (s.getVerbCount() >= schemaSize)
+		// for all active verbs
+		for (int i = 0; i < activeList.size(); i++) {
+			// build schema
+			Schema s = buildSchema(activeList.get(i).getVerb());
+			// add only if required number of verbs reached
+			// and if at least one chain with more than one event exists
+			if (s.getVerbCount() >= schemaSize && s.getLongestChainCount() > 1)
 				schemas.add(s);
 		}
 		printTimeTaken(start, "s");
@@ -777,12 +792,20 @@ public class SchemaBuilder {
 				ncw = new NCWriter();
 			// write to file
 			ncw.write(s.toString(), filename);
-			//System.out.println(s);
 		}
 		long end = System.currentTimeMillis();
 		System.err.println("Finished. Time taken: " + (end - start)/1000 + " s");
 	}
 
+	/**
+	 * Utility method to print time taken in a given format
+	 * <p>
+	 * Format is specified as a string and can be<br/><em>s</em>
+	 * for seconds<br/><em>m</em> for minutes<br/><em>ms</em> for 
+	 * milliseconds
+	 * @param startTime start time
+	 * @param format format
+	 */
 	private void printTimeTaken (long startTime, String format) {
 		long now = System.currentTimeMillis();
 		long sec = (now - startTime)/1000;
@@ -957,10 +980,10 @@ public class SchemaBuilder {
 	 */
 	private List<Event> getEvents (String verb) {
 		List<Event> events = new ArrayList<Event>();
-		for (int i = 0; i < otherlist.size(); i++) {
-			if (otherlist.get(i).getVerb().equals(verb))
-				if (!events.contains(otherlist.get(i)))
-					events.add(otherlist.get(i));
+		for (int i = 0; i < activeList.size(); i++) {
+			if (activeList.get(i).getVerb().equals(verb))
+				if (!events.contains(activeList.get(i)))
+					events.add(activeList.get(i));
 		}
 		return events;
 	}
@@ -971,9 +994,9 @@ public class SchemaBuilder {
 	 * @param verb verb
 	 */
 	private void deleteVerb (String verb) {
-		for (int i = 0; i < otherlist.size(); i++) {
-			if (otherlist.get(i).getVerb().equals(verb))
-				otherlist.remove(i--);
+		for (int i = 0; i < activeList.size(); i++) {
+			if (activeList.get(i).getVerb().equals(verb))
+				activeList.remove(i--);
 		}
 	}
 
@@ -995,7 +1018,7 @@ public class SchemaBuilder {
 	 */
 	public static void main(String[] args) {
 		try {
-			new SchemaBuilder().run(true, false, "schemas_size6_v6", true);
+			new SchemaBuilder().run(true, false, "schemas_size6_v1", true);
 		} catch (IOException e) {
 
 			e.printStackTrace();
