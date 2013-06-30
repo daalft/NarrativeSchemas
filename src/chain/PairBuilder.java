@@ -171,27 +171,34 @@ public class PairBuilder {
 		return 0;
 	}
 
+	/**
+	 * Main pair generating method
+	 * @throws IOException
+	 */
 	public void generatePairs () throws IOException {
 		readData();
 		System.err.println("Generating pairs...");
 		for (Entry e : entries) {
-			// generate id entry
+			// initialize local list
 			List <Pair> local = new ArrayList<Pair>();
+			// add ID to local list
 			local.add(new Pair(e.getId()));
+			// add local list to unique list
 			unique.add(local);
 			// generate pairs
 			boolean generationSuccess = treatBlock(e.getEventBlock());
+			// if no events were generated
 			if (!generationSuccess) {
+				// remove local from unique list
 				unique.remove(local);
 			}
 		}
-		// for each set
 		System.err.println("Writing output...");
+		// for each set
 		for (List<Pair> sp : unique) {
 			// for each pair
 			for (Pair p : sp)
 				writeOutput(p);
-				//System.out.println(p);
 		}
 		System.err.println("Done generating pairs.");
 	}
@@ -222,6 +229,7 @@ public class PairBuilder {
 			p4 = p1 + " |" + p2 + ":" + p3 + "|";
 		}
 		try {
+			// write output
 			ncw.write(p4, pairfile);
 			ncw.write("\n", pairfile);
 		} catch (IOException e) {
@@ -236,7 +244,9 @@ public class PairBuilder {
 	 */
 	private boolean treatBlock (List<EventBlock> le) {
 		boolean check = false;
+		// for all event blocks
 		for (EventBlock eb : le) {
+			// TODO CONTINUE ADDING COMMENTS HERE!!!	///		///		///		///
 			List<Pair> ret = treatEvent (eb);
 			if (!ret.isEmpty()) {
 				check = true;

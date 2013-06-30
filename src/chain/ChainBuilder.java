@@ -24,6 +24,11 @@ import edu.stanford.nlp.trees.GrammaticalRelation;
 import edu.stanford.nlp.trees.semgraph.SemanticGraph;
 import edu.stanford.nlp.trees.semgraph.SemanticGraphEdge;
 
+/**
+ * Class to build chains from textual input
+ * @author David
+ *
+ */
 public class ChainBuilder {
 	/**
 	 * Lock
@@ -164,7 +169,6 @@ public class ChainBuilder {
 			// ignore "be" and "do"
 			if (sge.getGovernor().lemma().equals("be")||sge.getGovernor().lemma().equals("do"))
 				return;
-			//System.err.println("Resolving coref...");
 			// build typed dependency with lemma, type and resolved coref and add to builder
 			tdl.add(new TypedDep(sge.getGovernor().lemma(), type, resolveCoref(sge.getTarget()), id));
 		}
@@ -187,7 +191,6 @@ public class ChainBuilder {
 		for (SemanticGraph sg : sentences) {
 			capture(sg, id);
 		}
-		// TODO change to list or leave as set
 		Set<NarrativeChain> ncl = new HashSet<NarrativeChain>();
 		System.err.println("Building chains...");
 		for (IndexedWord entity : entities) {
