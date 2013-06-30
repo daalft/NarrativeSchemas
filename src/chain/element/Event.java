@@ -13,11 +13,20 @@ public class Event implements Serializable, Comparable<Event> {
 	private String typedDep, mention, id;
 	private Set<String> mentions;
 	private int globalScore = 0;
+	private double maxScore = 0.0;
 	
 	public Event () {
 		mentions = new HashSet<String>();
 	}
 
+	public void setMaxScore (double d) {
+		maxScore = d;
+	}
+	
+	public double getMaxScore () {
+		return maxScore;
+	}
+	
 	public void incrementScore (int i) {
 		globalScore += i;
 	}
@@ -138,4 +147,5 @@ public class Event implements Serializable, Comparable<Event> {
 			return 1;
 		return 0;
 	}
+
 }
