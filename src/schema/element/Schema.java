@@ -2,10 +2,13 @@ package schema.element;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
-
 import chain.element.Chain;
 import chain.element.Event;
 
@@ -21,6 +24,13 @@ public class Schema implements Comparable<Schema> {
 		id = ++counter;
 	}
 
+	public int getLongestChainCount () {
+		List<Integer> counts = new ArrayList<Integer>();
+		for (Chain c : chains)
+			counts.add(c.getEvents().size());
+		return Collections.max(counts);
+	}
+	
 	public void incrementScore (double d) {
 		score += d;
 	}
@@ -31,8 +41,11 @@ public class Schema implements Comparable<Schema> {
 		return id;
 	}
 	public void add (Event e, int pos) {
-		if (pos < chains.size())
+		if (!containsVerb(e.getVerb()))
+			score += e.getMaxScore();
+		if (pos < chains.size()) {
 			chains.get(pos).add(e);
+		}
 		else {
 			Chain c = new Chain();
 			c.add(e);
@@ -40,6 +53,14 @@ public class Schema implements Comparable<Schema> {
 		}
 	}
 
+	private boolean containsVerb (String v) {
+		for (Chain c : chains)
+			for (Event e : c.getEvents())
+				if (e.getVerb().equals(v))
+					return true;
+		return false;
+	}
+	
 	public boolean contains (Event e) {
 		for (Chain c : chains) {
 			if (c.contains(e))
@@ -61,25 +82,44 @@ public class Schema implements Comparable<Schema> {
 		return verbs.size();
 	}
 
+	private List<Entry<String, Double>> getScoreMap () {
+		Map<String, Double> sm = new HashMap<String, Double>();
+		for (Chain c : chains) {
+			List<Event> le = c.getEvents();
+			for (Event e : le) {
+				String key = e.getVerb();
+				if (!sm.containsKey(key)) {
+					sm.put(key, e.getMaxScore());
+					
+				}
+			}
+		}
+		List<Entry<String, Double>> es = new ArrayList<Entry<String, Double>>(sm.entrySet());
+		Collections.sort(es, new Comparator <Entry<String, Double>>() {
+			@Override
+			public int compare(Entry<String, Double> o1,
+					Entry<String, Double> o2) {
+				return (o2.getValue().compareTo(o1.getValue()));
+			}
+			
+		});
+		return es;
+	}
+	
 	public String toString () {
 		Collections.sort(chains);
+		List<Entry<String, Double>> scores = getScoreMap();
 		StringBuilder sb = new StringBuilder("*****" + System.lineSeparator());
 		sb.append("score="+String.format("%.6f",score)).append(System.lineSeparator());
 		sb.append("Events: ");
-		Set<String> verbs = new HashSet<String>();
-		
-		for (Chain c : chains) {
-			for (Event e : c.getEvents()) {
-				verbs.add(e.getVerb());
-			}
+		for (Entry<String, Double> e : scores) {
+			sb.append(e.getKey()).append(" ");
 		}
-		for (String v : verbs)
-			sb.append(v).append(" ");
 		sb.deleteCharAt(sb.length()-1);
 		sb.append(System.lineSeparator());
 		sb.append("Scores: ");
-		for (Chain c : chains)
-			sb.append(String.format("%.3f",c.getScore())).append(" ");
+		for (Entry<String, Double> e : scores) 
+			sb.append(String.format("%.3f",e.getValue())).append(" ");
 		sb.deleteCharAt(sb.length()-1);
 		sb.append(System.lineSeparator());
 		for (Chain c : chains) {
