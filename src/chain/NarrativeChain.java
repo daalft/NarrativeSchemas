@@ -85,6 +85,7 @@ public class NarrativeChain {
 
 	/**
 	 * Standard toString method
+	 * @return string representation
 	 */
 	public String toString () {
 		StringBuilder sb = new StringBuilder();
