@@ -240,24 +240,26 @@ public class PairBuilder {
 	/**
 	 * Helper method to treat lists of event blocks
 	 * @param le list of event blocks
-	 * @return false if no events were generated. true otherwise
+	 * @return false if no pairs were generated. true otherwise
 	 */
 	private boolean treatBlock (List<EventBlock> le) {
 		boolean check = false;
 		// for all event blocks
 		for (EventBlock eb : le) {
-			// TODO CONTINUE ADDING COMMENTS HERE!!!	///		///		///		///
+			// get the pairs for an event
 			List<Pair> ret = treatEvent (eb);
+			// if pairs can be extracted
 			if (!ret.isEmpty()) {
 				check = true;
+				// if unique doesn't contain the result
 				if (!unique.contains(ret)) {
+					// add pairs to unique list
 					unique.add(ret);
 				}	
 			}
 		}
-		if (check) 
-			return true;
-		return false;
+		// return whether events were generated
+		return check;
 	}
 
 	/**
