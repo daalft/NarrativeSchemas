@@ -132,8 +132,10 @@ public class TypedDep {
 		return o;
 	}
 
-
-	
+	/**
+	 * Returns mention
+	 * @return mention
+	 */	
 	public String getMention () {
 		return mention;
 	}
