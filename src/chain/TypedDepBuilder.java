@@ -29,23 +29,8 @@ public class TypedDepBuilder {
 	
 	/**
 	 * Adds a TypedDep to this Builder
-	 * <p>
-	 * If a TypedDep with the same lemma and type exists,
-	 * the dependency is appended to that TypedDep.<br>
-	 * If no such TypedDep exists, the new TypedDep is 
-	 * added to the list of TypedDep in this Builder
-	 * @param td TypedDep to add
-	 *//*
-	public void add (TypedDep td) {
-		int index = getEntryIndex(td);
-		if (index > -1) { // entry exists
-			if (!list.get(index).getDep().word().equals(td.getDep().word()))
-				list.get(index).addDep(td.getDep());
-		} else { // entry does not exist
-			list.add(td);
-		}
-	}*/
-	
+	 * @param td TypedDep
+	*/	
 	public void add (TypedDep td) {
 		list.add(td);
 	}
