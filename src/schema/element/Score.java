@@ -1,6 +1,6 @@
 package schema.element;
 /**
- * Class used to represent a score of an event with pointers to the chain and event for later retrieval
+ * Class used to memorize the score of an event with pointers to the chain and event for later retrieval
  * @author David
  */ 
 public class Score implements Comparable<Score>{
