@@ -49,6 +49,7 @@ public class NCWriter {
 	 * Writes to output file
 	 * <p>Always appends content to file
 	 * @param text text to write
+	 * @param file optional filename
 	 * @throws IOException
 	 */
 	public void write (String text, String...file) throws IOException {
@@ -136,6 +137,10 @@ public class NCWriter {
 		defaultErrorPath = p;
 	}
 
+	/**
+	 * Returns the path to buffer file
+	 * @return path to buffer file as string
+	 */
 	public String getPath () {
 		return defaultPath;
 	}
