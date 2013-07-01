@@ -90,6 +90,7 @@ public class Reader {
 	public String getSplit () {
 		return canonicalDelimiter;
 	}
+	
 	/**
 	 * Method for reading plain text file content
 	 * @param f path to file
@@ -217,14 +218,26 @@ public class Reader {
 			dependencyPool.add(dependency);
 	}
 	
+	/**
+	 * Returns all read-in events
+	 * @return events
+	 */
 	public List<Event> getEvents () {
 		return events;
 	}
 	
+	/**
+	 * Returns read-in PMI table
+	 * @return pmi table
+	 */
 	public Map<String, Double> getTable () {
 		return table;
 	}
 	
+	/**
+	 * Returns read-in dependencies
+	 * @return dependencies
+	 */
 	public List<String> getDependencyPool () {
 		return dependencyPool;
 	}
