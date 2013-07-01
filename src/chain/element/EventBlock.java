@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 /**
 * Class used to represent a block of events
+* @author David
 */
 public class EventBlock implements Serializable {
 
