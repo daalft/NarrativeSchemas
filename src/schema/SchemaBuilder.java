@@ -78,6 +78,7 @@ public class SchemaBuilder {
 	 * No-argument constructor
 	 */
 	public SchemaBuilder () {
+		// initialize components
 		pmiTable = new HashMap<String, Double>();
 		frequencyTable = new HashMap<String, Integer>();
 		mentionPool = new ArrayList<String>();
@@ -101,10 +102,15 @@ public class SchemaBuilder {
 	private void readData (boolean writeFrequencyFile) throws IOException {
 		System.err.print("Reading data...");
 		long now = System.currentTimeMillis();
+		// initialize reader
 		Reader r = new Reader();
+		// read pair buffer file
 		r.readPairBuffer(path, fullArgument);
+		// retrieve dependencies
 		dependencyPool = r.getDependencyPool();
+		// retrieve pmi table
 		pmiTable = r.getTable();
+		// retrieve events
 		events = r.getEvents();
 		printTimeTaken(now, "ms");
 		populateFrequencyTable(writeFrequencyFile);
@@ -119,30 +125,39 @@ public class SchemaBuilder {
 	private void populateFrequencyTable (boolean write, String...file) throws IOException {
 		long startLog = System.currentTimeMillis();
 		System.err.print("Start populating frequency table...");
+		// filename
 		String fname = "";
+		// check for file with name "frequencyFile" in this directory
 		if (new File("./frequencyFile").exists()) {
+			// if file exists, set filename to this name
 			fname = "./frequencyFile";
+			// else if a filename is given, use that name
 		} else if (file.length > 0 && (new File(file[0]).exists())) {
 			fname = file[0];
 		}
+		// if filename is not empty
 		if (!fname.equals("")) {
+			// initialize reader
 			Reader r = new Reader();
+			// read file
 			String freq = r.readFile(new File(fname));
+			// retrieve information
 			for (String s : freq.split(System.lineSeparator())) {
 				String[] sp = s.split("\t");
+				// get frequency count
 				int intfreq = Integer.parseInt(sp[1]);
+				// populate table
 				frequencyTable.put(sp[0], intfreq);
 			}
 			printTimeTaken(startLog, "ms");
+			// end method
 			return;
 		}
 		// if no frequency file found, initialize writer
 		if (write)
 			ncw = new NCWriter();
-		//System.err.println("Total mentions: " + localMentions.size());
 		// merge events
 		list = mergeEvents();
-		
 		// remove verbs that don't have subject and object
 		purifyList();
 		// outer loop: for all verbs
@@ -189,7 +204,6 @@ public class SchemaBuilder {
 							// write file
 							ncw.write(key + "\t" + f + System.lineSeparator(), file.length>0?file[0]:"./frequencyFile");
 					}
-					//System.err.println(key);
 				}
 			}
 		}
@@ -285,7 +299,6 @@ public class SchemaBuilder {
 		// if table contains lookup key
 		if (pmiTable.containsKey(lookup)) {
 			// return value
-			//System.out.println("PMI Value for " + lookup + ": " + pmiTable.get(lookup));
 			return pmiTable.get(lookup);
 		}
 		// return 0.0 else
@@ -323,10 +336,9 @@ public class SchemaBuilder {
 				}
 			}
 		} catch (IndexOutOfBoundsException e) { // catch eventual exceptions
-
+			// empty block
 		}
 		// return frequency count
-		//System.out.println("Frequency of " + a + " with " + e1.getTypedDep() + " and " + e2.getTypedDep() + ": " + count);
 		return count;
 	}
 
@@ -358,7 +370,6 @@ public class SchemaBuilder {
 			// empty block
 		}
 		// return sum
-		//System.out.println("Score sum of chain " + c.toString() + " with " + a + ":" + sum);
 		return sum;
 	}
 
@@ -402,7 +413,6 @@ public class SchemaBuilder {
 		// clear the mention pool
 		mentionPool.clear();
 		// find and return the maximum value
-		//System.out.println("Chain similarity of chain " + c.toString() + " with verb " + f + " and dependency " + g + ": " + Collections.max(intern_scores));
 		double max = Collections.max(intern_scores);
 		return max;
 	}
@@ -462,8 +472,6 @@ public class SchemaBuilder {
 		loop:
 			// while schema contains less than schemaSize verbs
 			while (n.getVerbCount() < schemaSize) {
-				// remember verb count
-				
 				// initialize local score lists
 				List<GlobalScore> gs = new ArrayList<GlobalScore>();
 				List<Score> scoreS = new ArrayList<Score>();
@@ -549,7 +557,7 @@ public class SchemaBuilder {
 						vtd = es.getVerb();
 					}
 				}
-				// same as above
+				// same as above with object instead of subject
 				if (bestO != null) {
 					Event eo = activeList.get(bestO.getEventPosition());
 					eo.setMaxScore(best.getScore());
@@ -568,7 +576,7 @@ public class SchemaBuilder {
 							vtd = eo.getVerb();
 					}
 				}
-				// same as above
+				// same as above with preposition
 				if (bestP != null) {
 					Event ep = activeList.get(bestP.getEventPosition());
 					ep.setMaxScore(best.getScore());
@@ -584,7 +592,6 @@ public class SchemaBuilder {
 					if (vtd.equals(""))
 						vtd = ep.getVerb();
 				}
-				
 				// delete verb
 				deleteVerb(vtd);
 				// clear global score list
@@ -597,124 +604,6 @@ public class SchemaBuilder {
 		return n;
 	}
 	
-	/*
-	 * OLD buildSchema method
-
-	private Schema buildSchema (Event start) throws IOException {
-		int loopCounter = 0;
-		int maxLoops = 5;
-		// create new schema
-		Schema n = new Schema();
-		// add all available verb dependencies for start to different chains
-		if (hasComplement(start, "s"))
-			n.add(getComplement(start, "s"), 0);
-		if (hasComplement(start, "o"))
-			n.add(getComplement(start, "o"), 1);
-		if (hasComplement(start, "p"))
-			n.add(getComplement(start, "p"), 2);
-		//	System.err.println(n);
-		// previous maximum
-		//double prev_max = 0.0;
-		// sort list
-		Collections.sort(otherlist);
-		//System.out.println(list);
-		outerLoop: 
-			while(n.getVerbCount() < schemaSize) {
-				List<GlobalScore> gs = new ArrayList<GlobalScore>();
-				List<Score> scores = new ArrayList<Score>();
-				List<Score> scoreo = new ArrayList<Score>();
-				List<Score> scorep = new ArrayList<Score>();
-				Score maxs = null;
-				Score maxo = null;
-				Score maxp = null;
-				for (int k = 0; k < otherlist.size(); k++) {
-					scores.clear();
-					scoreo.clear();
-					scorep.clear();
-					if (otherlist.get(k).equals(start))
-						continue;
-					List<Chain> chains = n.getChains();
-					Event e = otherlist.get(k);
-					for (int i = 0; i < chains.size(); i++) {
-						Chain c = chains.get(i);
-						String v = e.getVerb();
-						if (hasComplement(e, "s"))						
-							scores.add(scorecalc(k, i, chainsim(c,v,"s")));
-						if (hasComplement(e, "o"))
-							scoreo.add(scorecalc(k, i, chainsim(c,v,"o")));
-						if (hasComplement(e, "p"))
-							scorep.add(scorecalc(k, i, chainsim(c,v,"p")));
-					}
-					if (!scores.isEmpty())
-						maxs = Collections.max(scores);
-					if (!scoreo.isEmpty())
-						maxo = Collections.max(scoreo);
-					if (!scorep.isEmpty())
-						maxp = Collections.max(scorep);
-					double intmax = ((maxs==null)?0:maxs.getScore()) + ((maxo==null)?0:maxo.getScore()) + ((maxp==null)?0:maxp.getScore());
-					if (intmax > 3*beta) {
-						gs.add(new GlobalScore(intmax, maxs, maxo, maxp));
-						//System.out.println(intmax);
-					}
-				}
-				if (gs.isEmpty())
-					break outerLoop;
-				GlobalScore best = Collections.max(gs);
-				//System.out.println(best);
-				//System.out.println(best.getScore());
-				if (best.getS() != null) {
-					Score bests = best.getS();
-					if (bests.getScore() == beta) {
-						n.add(otherlist.get(bests.getEventPosition()), n.getChainCount());
-					} else {
-						n.add(otherlist.get(bests.getEventPosition()), bests.getChainPosition());
-					}
-					n.incrementScore(bests.getScore());
-					otherlist.remove(bests.getEventPosition());
-				}
-				if (best.getO() != null) {
-					Score besto = best.getO();
-					if (besto.getScore() == beta) {
-						n.add(otherlist.get(besto.getEventPosition()), n.getChainCount());
-					} else {
-						n.add(otherlist.get(besto.getEventPosition()), besto.getChainPosition());
-					}
-					n.incrementScore(besto.getScore());
-					otherlist.remove(besto.getEventPosition());
-				}
-				if (best.getP() != null) {
-					Score bestp = best.getP();
-					if (bestp.getScore() == beta) {
-						try {
-						n.add(otherlist.get(bestp.getEventPosition()), n.getChainCount());
-						} catch (IndexOutOfBoundsException e) {
-							try {
-								n.add(otherlist.get(bestp.getEventPosition()-1), n.getChainCount());
-							} catch (IndexOutOfBoundsException e2) {
-								try {
-									n.add(otherlist.get(bestp.getEventPosition()-2), n.getChainCount());
-								} catch (IndexOutOfBoundsException e3) {
-									// empty
-								}
-							}
-						}
-					} else {
-						n.add(otherlist.get(bestp.getEventPosition()), bestp.getChainPosition());
-					}
-					n.incrementScore(bestp.getScore());
-					otherlist.remove(bestp.getEventPosition());
-				}
-				//System.out.println(n);
-				gs.clear();
-				// safety measure to avoid endless loop
-				loopCounter++;
-				if (loopCounter > maxLoops)
-					break outerLoop;
-			}
-		return n;
-	}
-	 */
-
 	/**
 	 * Private score calculation
 	 * <p>
@@ -735,15 +624,11 @@ public class SchemaBuilder {
 	private void purifyList () {
 		for (int i = 0; i < list.size(); i++) {
 			if (!(hasComplement(list.get(i), "s") &&hasComplement(list.get(i), "o"))) {
-				
-				list.remove(i--);
-				
-				
+				list.remove(i--);				
 			}
 		}
 	}
 
-	// TODO RUN METHOD
 	/**
 	 * Method to run SchemaBuilder
 	 * <p>
@@ -762,7 +647,9 @@ public class SchemaBuilder {
 	public void run (boolean shuffle, boolean sort, String filename, boolean writeFreqFile) throws IOException {
 		// read data
 		readData(writeFreqFile);
+		// merge events
 		list = mergeEvents();
+		// remove events that don't have subject and object position
 		purifyList();
 		// populate list of active verbs
 		activeList.addAll(list);
