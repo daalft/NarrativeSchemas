@@ -39,18 +39,18 @@ The second file is from the Apache Commons CLI package, the last four files are 
 Run `starter.TempStart <arguments>`
 where `arguments` are as follows:
 
--buffer <arg> path to buffer file
--error <arg> path to error buffer file
--corpus <arg> path to corpus  
+-buffer ARG path to buffer file  
+-error ARG path to error buffer file  
+-corpus ARG path to corpus  
 -f flag to indicate that path p is a folder, but does ONLY contain PLAIN TEXT files  
 -nyt flag to indicate that path p is a folder containing NYT formatted files  
--output <arg> desired filename of final output file  
--size <arg> size of schema (number of verbs). Default: 6  
+-output ARG desired filename of final output file  
+-size ARG size of schema (number of verbs). Default: 6  
 -shuffle shuffle verbs prior to schema building  
 -sort sort verbs prior to schema building  
 -write write frequency file. Default: false  
--beta <arg> set beta value. Default beta value: 0.2  
--lambda <arg> set lambda value. Default lambda value: 0.08  
+-beta ARG set beta value. Default beta value: 0.2  
+-lambda ARG set lambda value. Default lambda value: 0.08  
 -fpi use full prepositional information for prepositions. Default: false  
 -co chain builder only. Only runs the ChainBuilder (first part of algorithm)  
 -so schema builder only. Only runs the SchemaBuilder (third part of algorithm)  
@@ -61,9 +61,8 @@ where `arguments` are as follows:
 -size, -shuffle, -sort, -write, -beta, -lambda, -fpi, -co, -so and -np are optional.
 
 -buffer, -error, -corpus and -output take a filename/path as argument.  
--size takes an integer as argument  
--beta and -lambda take a floating point number as argument  
-
+-size takes an integer as argument.  
+-beta and -lambda take a floating point number as argument.
 
 A sample run (assuming that all relevant files are in a folder called "bin") would look like this:
 
