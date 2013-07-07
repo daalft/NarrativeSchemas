@@ -3,11 +3,15 @@
 ## About Narrative Schemas
 
 Narrative Schemas are structures extracted from text. This algorithm (originally by Chambers and Jurafsky, 2008/2009) 
-automatically extracts information about _events_ from a corpus. _Events_ are verbs and their _dependencies_.
+automatically extracts information about _events_ from a corpus. _Events_ are **verbs** and their _dependencies_.
 For example, in the text **My dog eats potatoes**, the _events_ would be **eat(subject, dog)** and
-**eat(object, potato)**.
+**eat(object, potato)**. Please note that words are lemmatized prior to further processing.  
+
 From all extracted events, the algorithm then tries to build _schemas_. A schema is a list of _events_
-that are likely to occur together in a text. 
+that are likely to occur together in a text. This likelihood is based on the coreference and co-occurrence of _fillers_, 
+the actual words filling the _dependencies_.  
+Using the above example, _dog_ and _potato_ are fillers, _dog_ filling the argument position of **subject**
+and _potato_ filling the argument position of **object**.  
 
 ## Running the program
 
