@@ -4,12 +4,16 @@ _Unsupervised Learning of Narrative Event Chains_
 Nathanael Chambers
 and
 Dan Jurafsky  
+Stanford University  
+Stanford, CA 94305  
 2008
 
 _Unsupervised Learning of Narrative Schemas and their Participants_  
 Nathanael Chambers
 and
 Dan Jurafsky  
+Stanford University  
+Stanford, CA 94305  
 2009
 
 Implementation:
