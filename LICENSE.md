@@ -1,12 +1,12 @@
 This algorithm is based on the following papers by Chambers and Jurafsky:
 
-_Unsupervised Learning of Narrative Event Chains_
+_Unsupervised Learning of Narrative Event Chains_  
 Nathanael Chambers
 and
 Dan Jurafsky  
 2008
 
-_Unsupervised Learning of Narrative Schemas and their Participants_
+_Unsupervised Learning of Narrative Schemas and their Participants_  
 Nathanael Chambers
 and
 Dan Jurafsky  
