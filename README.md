@@ -39,18 +39,18 @@ The second file is from the Apache Commons CLI package, the last four files are 
 Run `starter.TempStart <arguments>`
 where `arguments` are as follows:
 
--buffer path to buffer file. Default: ./buffer  
--error path to error buffer file. Default: ./bufferError  
--corpus path to corpus  
+-buffer <arg> path to buffer file
+-error <arg> path to error buffer file
+-corpus <arg> path to corpus  
 -f flag to indicate that path p is a folder, but does ONLY contain PLAIN TEXT files  
 -nyt flag to indicate that path p is a folder containing NYT formatted files  
--output desired filename of final output file  
--size size of schema (number of verbs). Default: 6  
+-output <arg> desired filename of final output file  
+-size <arg> size of schema (number of verbs). Default: 6  
 -shuffle shuffle verbs prior to schema building  
 -sort sort verbs prior to schema building  
 -write write frequency file. Default: false  
--beta set beta value. Default beta value: 0.2  
--lambda set lambda value. Default lambda value: 0.08  
+-beta <arg> set beta value. Default beta value: 0.2  
+-lambda <arg> set lambda value. Default lambda value: 0.08  
 -fpi use full prepositional information for prepositions. Default: false  
 -co chain builder only. Only runs the ChainBuilder (first part of algorithm)  
 -so schema builder only. Only runs the SchemaBuilder (third part of algorithm)  
@@ -58,7 +58,12 @@ where `arguments` are as follows:
 
 -f and -nyt cannot be set simultaneously.  
 -sort and -shuffe can be set simultaneously, but -sort always takes precedence over -shuffle.  
-buffer, error, size, shuffle, sort, write, beta, lambda, fpi, co, so and np are optional.
+-size, -shuffle, -sort, -write, -beta, -lambda, -fpi, -co, -so and -np are optional.
+
+-buffer, -error, -corpus and -output take a filename/path as argument.  
+-size takes an integer as argument  
+-beta and -lambda take a floating point number as argument  
+
 
 A sample run (assuming that all relevant files are in a folder called "bin") would look like this:
 
