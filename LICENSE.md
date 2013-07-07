@@ -1,22 +1,22 @@
 This algorithm is based on the following papers by Chambers and Jurafsky:
 
-Unsupervised Learning of Narrative Event Chains
+_Unsupervised Learning of Narrative Event Chains_
 Nathanael Chambers
 and
-Dan Jurafsky
+Dan Jurafsky  
 2008
 
-Unsupervised Learning of Narrative Schemas and their Participants
+_Unsupervised Learning of Narrative Schemas and their Participants_
 Nathanael Chambers
 and
-Dan Jurafsky
+Dan Jurafsky  
 2009
 
 Implementation:
 
-David Alfter
-University of Trier
-Germany
+David Alfter  
+University of Trier  
+Germany  
 2013
 
-All content is licensed to their respective owners.
+**All content is licensed to their respective owners.**
