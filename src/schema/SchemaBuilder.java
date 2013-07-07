@@ -64,7 +64,7 @@ public class SchemaBuilder {
 	/**
 	 * Schema size
 	 */
-	private int schemaSize = 8;
+	private int schemaSize = 6;
 	/**
 	 * Schemas
 	 */
