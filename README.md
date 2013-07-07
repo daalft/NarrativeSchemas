@@ -21,7 +21,7 @@ Unzip both packages.
 
 Compile the java files to a jar file. (In this example, the file is named "NarrativeSchemas.jar")
 
-Set the classpath to include the following files:
+Set the classpath to include the following files:  
 NarrativeSchemas.jar  
 commons-cli-1.2.jar  
 joda-time.jar  
@@ -58,7 +58,10 @@ buffer, error, size, shuffle, sort, write, beta, lambda, fpi, co, so and np are 
 
 A sample run (assuming that all relevant files are in a folder called "bin") would look like this:
 
-`java -cp bin/commons-cli-1.2.jar;bin/NarrativeSchemas.jar;bin/joda-time.jar;bin/stanford-corenlp-2012-07-06-models.jar;bin/stanford-corenlp-2012-07-09.jar;bin/xom.jar starter.Starter -buffer ./buffer -error ./errorb (-nyt|-f) -corpus c:/users/david.stephan-pc/downloads/nyt [-np|-co|-so] -output ./schemas_size6_v1 [-size 6] [-shuffle|-sort] [-write] [-beta 0.3] [-lambda 0.07] [-fpi]`
+`java -cp bin/commons-cli-1.2.jar;bin/NarrativeSchemas.jar;bin/joda-time.jar;bin/stanford-corenlp-2012-07-06-models.jar;`
+`bin/stanford-corenlp-2012-07-09.jar;bin/xom.jar starter.Starter -buffer ./buffer -error ./errorb (-nyt|-f)` 
+`-corpus c:/users/david.stephan-pc/downloads/nyt [-np|-co|-so] -output ./schemas_size6_v1 [-size 6] [-shuffle|-sort]` 
+`[-write] [-beta 0.3] [-lambda 0.07] [-fpi]`
 
 ## Problems
 
