@@ -67,8 +67,7 @@ where `arguments` are as follows:
 A sample run (assuming that all relevant files are in a folder called "bin") would look like this:
 
 `java -cp bin/commons-cli-1.2.jar;bin/NarrativeSchemas.jar;bin/joda-time.jar;`
-`bin/stanford-corenlp-2012-07-06-models.jar;`
-`bin/stanford-corenlp-2012-07-09.jar;bin/xom.jar` 
+`bin/stanford-corenlp-2012-07-06-models.jar;bin/stanford-corenlp-2012-07-09.jar;bin/xom.jar` 
 `starter.Starter -buffer ./buffer -error ./errorb (-nyt|-f)` 
 `-corpus c:/path/to/corpus/nyt [-np|-co|-so] -output ./schemas_size6_v1 [-size 6] [-shuffle|-sort]` 
 `[-write] [-beta 0.3] [-lambda 0.07] [-fpi]`
